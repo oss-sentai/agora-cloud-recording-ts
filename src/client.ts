@@ -1,5 +1,6 @@
 import Axios, { AxiosInstance } from 'axios';
 import CloudrecodingClientInterface, { AcquireResponse, StopResponse, UpdateResponse, UpdateLayoutResponse, StartResponse, AcquirePrams } from "./clientInterface";
+import { STATUS_CODE } from './constains';
 
 interface RecordingParams {
   plainCredentials: string,
@@ -31,8 +32,12 @@ class CloudrecodingClient implements CloudrecodingClientInterface {
 
   async acquire(acquirePrams: AcquirePrams): Promise<AcquireResponse> {
     try {
-      const agoraRes = await this.apiClient.post('/cloud_recording/acquire', acquirePrams);
-      // TODO: create response
+      const agoraRes = await this.apiClient.post<AcquireResponse>('/cloud_recording/acquire', acquirePrams);
+      if (agoraRes.status !== STATUS_CODE.SUCCESS) {
+        throw new Error(agoraRes.statusText)
+      }
+
+      return agoraRes.data
     } catch (e) {
       return
     }
@@ -51,3 +56,5 @@ class CloudrecodingClient implements CloudrecodingClientInterface {
     throw new Error("Method not implemented.");
   }
 }
+
+export default CloudrecodingClient
